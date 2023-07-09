@@ -1,7 +1,9 @@
 ﻿using ADO.NET_HW_2.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -33,7 +35,9 @@ namespace ADO.NET_HW_2
             {"4.5", "Показать овощи и фрукты с калорийностью ниже указанной;" },
             {"4.6", "Показать овощи и фрукты с калорийностью выше указанной;" },
             {"4.7", "Показать овощи и фрукты с калорийностью в указанном диапазоне;" },
-            {"4.8", "Показать все овощи и фрукты, у которых цвет желтый или красный." }
+            {"4.8", "Показать все овощи и фрукты, у которых цвет желтый или красный." },
+            {"Удалить", "Удаление одной записи из таблицы" },
+            {"Обновить", "Изменяет цвет овоща/фрукта с красного на белый " }
         };
             _fruits = new List<Fruis>();
             _vegetables = new List<Vegetables>();
@@ -193,7 +197,30 @@ namespace ADO.NET_HW_2
             _db.DivideOnVegsAndFruits(_db.CommandCreation(commandText), ref _fruits, ref _vegetables);
             ShowEnteredMember("FullName");
         }
-        
+
+        private async void Delete()
+        {
+            string name = txtBox_ValueInput.Text;
+            string commandText = $"DELETE " +
+                                 $"FROM VegsFruits " +
+                                 $"WHERE Name='{name}'";
+
+            int res = await _db.CommandCreation(commandText).ExecuteNonQueryAsync();
+            txtBox_Result.Text = res.ToString();
+            return;
+        }
+
+        private new async void Update()
+        {
+            string commandText = $"UPDATE VegsFruits " +
+                                 $"SET Color = 'White' " +
+                                 $"WHERE Color = 'Red'";
+
+            int number = await _db.CommandCreation(commandText).ExecuteNonQueryAsync();
+            txtBox_Result.Text = number.ToString();
+            return;
+        }
+
         private void AddToDel()
         {
             _action += ShowAll;
@@ -212,6 +239,8 @@ namespace ADO.NET_HW_2
             _action += ShowAmountOfFruitsAndVegsHigerByCalories;
             _action += ShowAmountOfFruitsAndVegsInSelectedRangeOfCalories;
             _action += ShowAmountOfFruitsAndVegsWithRedOrYellowColor;
+            _action += Delete;
+            _action += Update;
         }
 
         private void cmbBox_Tasks_SelectedIndexChanged(object sender, EventArgs e) =>
@@ -243,7 +272,6 @@ namespace ADO.NET_HW_2
             _fruits.Clear();
             _vegetables.Clear();
         }
-
 
     }
     
